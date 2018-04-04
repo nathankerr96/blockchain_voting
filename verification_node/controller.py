@@ -1,10 +1,11 @@
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Manager
 
 import blockchain
 import vote_listener
 
 
-if __name__ == "__main__":
+def main()
+    manager = Manager()
     vote_queue = Queue()
 
 
@@ -15,3 +16,7 @@ if __name__ == "__main__":
     listener_process.start()
 
     blockchain_process.join()
+
+
+if __name__ == "__main__":
+    main()

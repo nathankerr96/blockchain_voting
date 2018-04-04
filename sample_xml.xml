@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<election>
+
+    <title>California General Election 2018</title>
+    <date>11/06/2018</date>
+
+    <ballot>
+        
+        <item>
+            <title>U.S. Senate</title>
+            <candidates>
+                <candidate>Dianne Feinstein</candidate>
+                <candidate>Kevin de Leon</candidate>
+            </candidates>
+        </item>
+
+        <item>
+            <title>43rd Congressional Distict</title>
+            <candidates>
+                <candidate>Maxine Waters</candidate>
+                <candidate>Forest Baker</candidate>
+                <candidate>Candance Camper</candidate>
+                <candidate>Frank DeMartini</candidate>
+            </candidates>
+        </item>
+
+    </ballot>
+
+</election>

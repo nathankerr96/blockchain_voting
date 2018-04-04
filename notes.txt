@@ -1,0 +1,15 @@
+
+
+Technical Problems:
+    How do we communicate votes to listener?
+    How do we store votes on the blockchain?
+        Sparse due to districts?
+
+
+Design Problems:
+    Use timing to figure out who a person voted for.
+        Assume large number of people vote at any given time.
+    People vote on different candidates depending on location
+        Store each vote individually
+            Submit as one vote, check key, split and post to blockchain
+        Just need simple tally

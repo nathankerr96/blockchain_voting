@@ -5,20 +5,25 @@ def add_to_queue(vote):
     vote_queue.put(vote)
 
 def start_listening():
+    global incoming_vote_queue
 
     #get vote from network
 
     while True:
-        vote = "test"
+        vote = incoming_vote_queue.get()
 
-        add_to_queue(vote)
+        add_to_queue(str(vote))
 
         time.sleep(0.5)
 
 
-def begin(vq):
+def begin(vq, ivq):
     global vote_queue
+    global incoming_vote_queue
+
     vote_queue = vq
+    incoming_vote_queue = ivq
+
 
 
     start_listening()

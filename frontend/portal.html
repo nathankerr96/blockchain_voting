@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<body>
+<head>
+<style>
+table {
+    table-layout: fixed;
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    word-wrap:break-word;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="crypto/sha256.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/jsbn.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/jsbn2.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/prng4.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/rng.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/rsa.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/base64.js"></script>
+</head>
+
+<p1>Voting Portal</p1>
+
+<br>
+
+Please select key pair file: 
+
+<form id ="ballot" onsubmit="sendRequest()">
+	<input type="file" id="filetoread" /><br>
+
+	<input type="radio" name="candidates" value="clinton" checked> Clinton<br>
+  	<input type="radio" name="candidates" value="trump"> Trump<br>
+  	<input type="radio" name="candidates" value="other"> Other<br>
+
+  	<input type="hidden" name="publickey">
+	<input type="hidden" name="candidate">
+	<input type="hidden" name="signature">
+
+	<input type="submit" value="submit">
+</form>
+
+<table>
+  	<tr>
+    	<th>Public Key</th>
+    	<th id="filecontents"></th>
+  	</tr>
+</table>
+
+
+</body>
+<script>
+var n;
+var exp;
+var d;
+window.onload = function () { 
+	//Check the support for the File API support 
+	if (window.File && window.FileReader && window.FileList && window.Blob) {
+	    var fileSelected = document.getElementById('filetoread');
+	    fileSelected.addEventListener('change', function (e) { 
+	        //Set the extension for the file 
+	        var fileExtension = /text.*/; 
+	        //Get the file object 
+	        var fileTobeRead = fileSelected.files[0];
+	        //Check of the extension match 
+	        if (fileTobeRead.type.match(fileExtension)) { 
+	            //Initialize the FileReader object to read the 2file 
+	            var fileReader = new FileReader(); 
+	            fileReader.onload = function (e) { 
+	                var fileContents = document.getElementById('filecontents'); 
+
+	                parser = new DOMParser();
+					xmlDoc = parser.parseFromString(fileReader.result,"text/xml");
+					n = xmlDoc.getElementsByTagName("Modulus")[0].childNodes[0].nodeValue;
+					exp = xmlDoc.getElementsByTagName("Exponent")[0].childNodes[0].nodeValue;
+					d = xmlDoc.getElementsByTagName("D")[0].childNodes[0].nodeValue;
+
+	                fileContents.innerText =  n + exp; 
+	            } 
+	            fileReader.readAsText(fileTobeRead); 
+	         } 
+	        else { 
+	            alert("Please select key file"); 
+	        }
+	 
+	    }, false);
+	} 
+	else { 
+	    alert("Files are not supported"); 
+	} 
+}
+
+function sign(D, N, H) {
+	var rsa = new RSAKey();
+	//alert(b64tohex(N));
+	//alert(b64tohex(D));
+	//temp = parseBigInt(H,16);
+	//alert(temp);
+    var nhex = b64tohex(N);
+    var dhex = b64tohex(D);
+    alert("HERE");
+	rsa.setPublic(nhex, dhex);
+	//alert(rsa.n);
+	//alert(rsa.e);
+	res = rsa.getSignature(H);
+	hexsign = res.toString(16);
+	return hex2b64(hexsign);
+}
+
+function sendRequest() {
+	candObj = {};
+	var candidates = document.getElementById('ballot');
+	for (var i = 0; i < candidates['candidates'].length; i++) {
+		candObj[candidates['candidates'][i].value] = candidates['candidates'][i].checked;
+	}
+	voteObj = {};
+	voteObj['public_key'] = n + exp;
+	voteObj['ballot'] = candObj;
+
+	hash = sha256(JSON.stringify(candObj));
+	//alert(hash);
+	S = sign(d, n, hash);
+	voteObj['signature'] = S;
+
+	var url = "http://ec2-18-220-24-38.us-east-2.compute.amazonaws.com:5000?vote=" + JSON.stringify(voteObj);
+
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200) {
+	    	alert(this.responseText);
+	    }
+	};
+	xhttp.open("GET", url, true);
+  	xhttp.send();
+
+    alert("HERE AFTER XHTTP")
+
+  	//S = getSignature(d, n, sha256(candObj));
+
+    alert(url);
+    //alert(xhttp.status);
+}
+</script>
+</html>

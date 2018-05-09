@@ -17,7 +17,7 @@ def start_listening():
         time.sleep(0.5)
 
 
-def begin(vq, ivq):
+def begin_listener(vq, ivq):
     global vote_queue
     global incoming_vote_queue
 

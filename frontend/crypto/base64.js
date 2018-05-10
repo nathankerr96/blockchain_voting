@@ -55,7 +55,6 @@ function b64tohex(s) {
   }
   if(k == 1)
     ret += int2char(slop << 2);
-  alert("HERE IN b64");
   return ret;
 }
 

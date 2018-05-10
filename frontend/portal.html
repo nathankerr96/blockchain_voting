@@ -3,6 +3,46 @@
 <body>
 <head>
 <style>
+html {
+  position: relative;
+  min-height: 100%;
+  height: 100%;
+}
+
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  height: 100%;
+}
+
+div {
+	padding: 5px;
+	border-radius: 5px;
+}
+
+body > .container {
+  padding: 60px 15px 0;
+}
+
+.container .text-muted {
+  margin: 20px 0;
+}
+
+body > .container-fluid {
+  padding: 60px 15px 0;
+}
+
+.container-fluid .text-muted {
+  margin: 20px 0;
+}
+
+.well {
+  background: rgb(223, 240, 216);
+}
+
+label {
+	font-weight: bold;
+}
+
 table {
     table-layout: fixed;
     font-family: arial, sans-serif;
@@ -21,7 +61,12 @@ tr:nth-child(even) {
     background-color: #dddddd;
 }
 </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+<link rel="stylesheet" href="bootstrap-horizon.css">
+
+<script src="jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
 <script src="crypto/sha256.min.js"></script>
 <script language="JavaScript" type="text/javascript" src="crypto/jsbn.js"></script>
 <script language="JavaScript" type="text/javascript" src="crypto/jsbn2.js"></script>
@@ -31,25 +76,44 @@ tr:nth-child(even) {
 <script language="JavaScript" type="text/javascript" src="crypto/base64.js"></script>
 </head>
 
-<p1>Voting Portal</p1>
+<div class="container">
+<h1>Voting Portal</h1>
 
 <br>
 
-Please select key pair file: 
 
-<form id ="ballot" onsubmit="sendRequest()">
-	<input type="file" id="filetoread" /><br>
 
-	<input type="radio" name="candidates" value="clinton" checked> Clinton<br>
-  	<input type="radio" name="candidates" value="trump"> Trump<br>
-  	<input type="radio" name="candidates" value="other"> Other<br>
+<div id="votewell" class="well">
+	<form class="form-horizontal" id ="ballot" onsubmit="sendRequest()">
+		<div class="form-group">
+			<label for="filetoread" class="col-sm-2 control-label">Key pair file: </label>
+			<div class="col-sm-10">
+				<input type="file" id="filetoread" class="form-control"/><br>
+			</div>
+		</div>
 
-  	<input type="hidden" name="publickey">
-	<input type="hidden" name="candidate">
-	<input type="hidden" name="signature">
+		<div class="form-group">
+			<label for="candidates" class="col-sm-2 control-label">Presidential Candidate: </label>
+				<div class="col-sm-10">
+					Alice <input id="candidates" type="radio" name="candidates" value="alice" class="form-control">
+				  	Bob <input id="candidates" type="radio" name="candidates" value="bob" class="form-control">
+				  	Carol <input id="candidates" type="radio" name="candidates" value="carol" class="form-control">
+				  	Eve <input id="candidates" type="radio" name="candidates" value="eve" class="form-control">
+				</div>
+	  	</div>
 
-	<input type="submit" value="submit">
-</form>
+	  	<input type="hidden" name="publickey">
+		<input type="hidden" name="candidate">
+		<input type="hidden" name="signature">
+
+		<div class="form-group">
+			<div class="col-sm-10">
+				<input class="btn btn-primary" type="button" value="submit" onClick="sendRequest()">
+			</div>
+		</div>
+	</form>
+</div>
+
 
 <table>
   	<tr>
@@ -57,6 +121,7 @@ Please select key pair file:
     	<th id="filecontents"></th>
   	</tr>
 </table>
+</div>
 
 
 </body>
@@ -107,10 +172,7 @@ function sign(D, N, H) {
 	//alert(b64tohex(D));
 	//temp = parseBigInt(H,16);
 	//alert(temp);
-    var nhex = b64tohex(N);
-    var dhex = b64tohex(D);
-    alert("HERE");
-	rsa.setPublic(nhex, dhex);
+	rsa.setPublic(b64tohex(N),b64tohex(D));
 	//alert(rsa.n);
 	//alert(rsa.e);
 	res = rsa.getSignature(H);
@@ -125,7 +187,8 @@ function sendRequest() {
 		candObj[candidates['candidates'][i].value] = candidates['candidates'][i].checked;
 	}
 	voteObj = {};
-	voteObj['public_key'] = n + exp;
+	voteObj['public_key_n'] = n;
+	voteObj['public_key_e'] = exp;
 	voteObj['ballot'] = candObj;
 
 	hash = sha256(JSON.stringify(candObj));
@@ -144,11 +207,10 @@ function sendRequest() {
 	xhttp.open("GET", url, true);
   	xhttp.send();
 
-    alert("HERE AFTER XHTTP")
-
   	//S = getSignature(d, n, sha256(candObj));
+    alert("Vote submitted");
 
-    alert(url);
+    //alert(url);
     //alert(xhttp.status);
 }
 </script>

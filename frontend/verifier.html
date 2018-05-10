@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>JavaScript Signature Verifier Demo</title>
+  </head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/sha256.min.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/jsbn.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/jsbn2.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/prng4.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/rng.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/rsa.js"></script>
+<script language="JavaScript" type="text/javascript" src="crypto/base64.js"></script>
+<script language="JavaScript">
+<!--
+function verify_sign() {
+  var rsa = new RSAKey();
+  rsa.setPublic(b64tohex(document.signtest.n.value), b64tohex(document.signtest.e.value));
+  var res = rsa.getSignature(b64tohex(document.signtest.signature.value));
+
+  var h = hex2b64(sha256(document.signtest.plaintext.value));
+  document.signtest.plainhash.value = h;
+
+  if(res) {
+    res = res.toString(16);
+    document.signtest.signhash.value = hex2b64(res);
+  }
+}
+//-->
+</script>
+  <h1>JavaScript Signature Verifier Demo</h1>
+
+<form name="signtest" onSubmit='verify_sign()'>
+  Plaintext (string):<br>
+  <input name="plaintext" type="text" value="test" size=40><br>
+  Signature (base64):<br>
+  <textarea name="signature" rows=4 cols=70></textarea><p>
+  Public Key e (base64):<br>
+  <input name="e" type="text" size=40><br>
+  Public Key n (base64):<br>
+  <textarea name="n" rows=4 cols=70></textarea><p>
+  <input type="button" value="hash" onClick="verify_sign();"><p>
+  <hr>
+  <h2>Signatures</h2><p>
+  Signature Hash (base64):<br>
+  <textarea name="signhash" type="text" rows=4 cols=70></textarea><br>
+  Plaintext Hash (base64):<br>
+  <textarea name="plainhash" type="text" rows=4 cols=70></textarea><br>
+</form>
+  </body>
+</html>

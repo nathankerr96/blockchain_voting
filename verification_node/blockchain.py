@@ -9,7 +9,7 @@ HASH_LENGTH = 256
 class Block:
 
     #how many leading 0's are needed to accept a hash, adding 1 will double difficulty
-    _INITIAL_DIFFICULTY = 16
+    _INITIAL_DIFFICULTY = 18
 
 
     def __init__(self, prev_hash):
@@ -128,7 +128,7 @@ class Block:
             hash_string = self.calc_hash()
             
             if self._accept_hash(hash_string):
-                print("success")
+                #print("success")
                 print(self._nonce)
                 print(self._votes)
                 return hash_string
@@ -177,18 +177,30 @@ class BlockChain:
         return Block(secrets.token_bytes(HASH_LENGTH))
 
     def start(self):
+        global blocks_queue
+        block_count = 0
+
         while True:
             #mine block
             hash_string = self.current_block.mine()
 
+            '''
             if self.current_block.verify(hash_string):
                 print("Verified!")
             else:
                 print("Not verified.")
+            '''
 
             #block has been solved, create new block
+
             new_block = Block(hash_string)
             self.current_block.next_block = new_block
+            
+            #blocks_queue.put_nowait(self.current_block)
+            blocks_queue.put_nowait(block_count)
+            print("Put", block_count, "in queue")
+            block_count += 1
+
             self.current_block = new_block
 
 
@@ -203,14 +215,17 @@ def get_votes_in_queue():
     return tuple(vote_list)
 
 
-def begin(vq):
+def begin_blockchain(vq, bq):
     global vote_queue
+    global blocks_queue
     vote_queue = vq
+    blocks_queue = bq
 
-    blockchain = BlockChain()
-    blockchain.start()
+    bchain = BlockChain()
+    bchain.start()
     
 
+'''
 def main():
     global vote_queue
     vote_queue = Queue()
@@ -220,7 +235,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    
-
-
+'''
